@@ -801,8 +801,11 @@
   requestAnimationFrame(tick);
 
   if ("serviceWorker" in navigator && window.location.protocol.startsWith("http")) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./sw.js").catch(() => {});
-    });
+    const registerSW = () => navigator.serviceWorker.register("./sw.js").catch(() => {});
+    if (document.readyState === "complete") {
+      registerSW();
+    } else {
+      window.addEventListener("load", registerSW);
+    }
   }
 })();
