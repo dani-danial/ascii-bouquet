@@ -446,6 +446,8 @@
   const btnTheme = document.getElementById("btn-theme");
   const themeLabel = document.getElementById("theme-label");
   const btnReset = document.getElementById("btn-reset");
+  const btnSave = document.getElementById("btn-save");
+  const saveLabel = document.getElementById("save-label");
 
   // State
   const bouquetPoints = buildBouquetPoints();
@@ -587,10 +589,25 @@
     return `rgb(${r},${g},${b})`;
   }
 
-  function renderFrame() {
-    const total = cols * rows;
-    zBuf.fill(-Infinity);
-    chBuf.fill(null);
+  const MONO_FONT = '"JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace, Menlo, Consolas, monospace';
+
+  function renderScene(
+    targetCtx,
+    w,
+    h,
+    gCols,
+    gRows,
+    gFontSize,
+    gCellW,
+    gCellH,
+    bufZ,
+    bufCh,
+    bufCol,
+    basePxScale,
+    cyRatio
+  ) {
+    bufZ.fill(-Infinity);
+    bufCh.fill(null);
 
     const cosY = Math.cos(rotY);
     const sinY = Math.sin(rotY);
@@ -598,11 +615,8 @@
     const sinX = Math.sin(rotX);
 
     const camDist = 3.1;
-    // Fit the bouquet (~1.45 wide x ~2.05 tall) comfortably on both portrait phones and desktop
-    const basePxScale = Math.min(cssW * 1.84, cssH * 1.03) * zoom;
-
-    const cx = cols * 0.5;
-    const cy = rows * 0.53;
+    const cx = gCols * 0.5;
+    const cy = gRows * cyRatio;
 
     // Light vector (normalized)
     const lx = 0.42;
@@ -610,12 +624,9 @@
     const lz = 0.5;
 
     function projectPoint(px, py, pz, nx, ny, nz, role, fixedCh, tint) {
-      // Shift bouquet slightly upward around center
       const wy = py + 0.14;
-      // Rotate around Y
       const x1 = px * cosY + pz * sinY;
       const z1 = -px * sinY + pz * cosY;
-      // Rotate around X
       const y2 = wy * cosX - z1 * sinX;
       const z2 = wy * sinX + z1 * cosX;
 
@@ -623,15 +634,14 @@
       if (depth <= 0.35) return;
       const invZ = 1 / depth;
 
-      const sx = Math.round(cx + (x1 * basePxScale * invZ) / cellW);
-      const sy = Math.round(cy - (y2 * basePxScale * invZ) / cellH * (1 / 1.0));
-      if (sx < 0 || sx >= cols || sy < 0 || sy >= rows) return;
+      const sx = Math.round(cx + (x1 * basePxScale * invZ) / gCellW);
+      const sy = Math.round(cy - (y2 * basePxScale * invZ) / gCellH);
+      if (sx < 0 || sx >= gCols || sy < 0 || sy >= gRows) return;
 
-      const idx = sy * cols + sx;
-      if (invZ <= zBuf[idx]) return;
-      zBuf[idx] = invZ;
+      const idx = sy * gCols + sx;
+      if (invZ <= bufZ[idx]) return;
+      bufZ[idx] = invZ;
 
-      // Rotate normal
       const nx1 = nx * cosY + nz * sinY;
       const nz1 = -nx * sinY + nz * cosY;
       const ny2 = ny * cosX - nz1 * sinX;
@@ -642,8 +652,8 @@
         fixedCh ||
         SHADE_CHARS[Math.min(SHADE_CHARS.length - 1, Math.floor(lum * (SHADE_CHARS.length - 0.01)))];
 
-      chBuf[idx] = ch;
-      colBuf[idx] = colorForRole(role, lum, tint);
+      bufCh[idx] = ch;
+      bufCol[idx] = colorForRole(role, lum, tint);
     }
 
     for (let i = 0; i < bouquetPoints.length; i++) {
@@ -657,30 +667,91 @@
       projectPoint(p.x, p.y, p.z, 0, 0.5, 0.86, p.role, p.ch, twinkle * p.life);
     }
 
-    // Draw ASCII buffer onto canvas
-    ctx.clearRect(0, 0, cssW, cssH);
-    ctx.textBaseline = "top";
-    ctx.font = `600 ${fontSize}px "JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace, Menlo, Consolas, monospace`;
+    targetCtx.textBaseline = "top";
+    targetCtx.font = `600 ${gFontSize}px ${MONO_FONT}`;
 
-    const offsetX = (cssW - cols * cellW) * 0.5;
-    const offsetY = (cssH - rows * cellH) * 0.5;
+    const offsetX = (w - gCols * gCellW) * 0.5;
+    const offsetY = (h - gRows * gCellH) * 0.5;
 
     let lastColor = "";
-    for (let r = 0; r < rows; r++) {
-      const yPos = offsetY + r * cellH;
-      const rowOffset = r * cols;
-      for (let c = 0; c < cols; c++) {
+    for (let r = 0; r < gRows; r++) {
+      const yPos = offsetY + r * gCellH;
+      const rowOffset = r * gCols;
+      for (let c = 0; c < gCols; c++) {
         const idx = rowOffset + c;
-        const ch = chBuf[idx];
+        const ch = bufCh[idx];
         if (!ch) continue;
-        const col = colBuf[idx];
+        const col = bufCol[idx];
         if (col !== lastColor) {
-          ctx.fillStyle = col;
+          targetCtx.fillStyle = col;
           lastColor = col;
         }
-        ctx.fillText(ch, offsetX + c * cellW, yPos);
+        targetCtx.fillText(ch, offsetX + c * gCellW, yPos);
       }
     }
+  }
+
+  function renderFrame() {
+    ctx.clearRect(0, 0, cssW, cssH);
+    const basePxScale = Math.min(cssW * 1.84, cssH * 1.03) * zoom;
+    renderScene(ctx, cssW, cssH, cols, rows, fontSize, cellW, cellH, zBuf, chBuf, colBuf, basePxScale, 0.53);
+  }
+
+  function exportWidgetCard() {
+    const size = 1080;
+    const out = document.createElement("canvas");
+    out.width = size;
+    out.height = size;
+    const octx = out.getContext("2d");
+
+    // Solid dark backdrop + theme glow
+    octx.fillStyle = "#0b090e";
+    octx.fillRect(0, 0, size, size);
+    const theme = THEMES[currentThemeKey];
+    const grad = octx.createRadialGradient(size * 0.5, size * 0.5, 20, size * 0.5, size * 0.5, size * 0.55);
+    grad.addColorStop(0, theme.glow);
+    grad.addColorStop(1, "rgba(11, 9, 14, 0)");
+    octx.fillStyle = grad;
+    octx.fillRect(0, 0, size, size);
+
+    // Header text matching live view
+    octx.textAlign = "center";
+    octx.textBaseline = "top";
+    octx.fillStyle = theme.accent;
+    octx.font = `600 24px ${MONO_FONT}`;
+    octx.fillText((elKicker.textContent || "CODED WITH LOVE").toUpperCase(), size * 0.5, 58);
+
+    const titleBase = currentTo ? `for ${currentTo}` : "a digital bouquet";
+    octx.fillStyle = "#f7f2f5";
+    octx.font = `600 46px ${MONO_FONT}`;
+    octx.fillText(`${titleBase} ♥`, size * 0.5, 96);
+
+    octx.textAlign = "left";
+    const expFont = 16;
+    octx.font = `600 ${expFont}px ${MONO_FONT}`;
+    const expCellW = octx.measureText("M").width || expFont * 0.6;
+    const expCellH = Math.round(expFont * 1.18);
+    const expCols = Math.floor(size / expCellW);
+    const expRows = Math.floor(size / expCellH);
+    const total = expCols * expRows;
+
+    renderScene(
+      octx,
+      size,
+      size,
+      expCols,
+      expRows,
+      expFont,
+      expCellW,
+      expCellH,
+      new Float32Array(total),
+      new Array(total),
+      new Array(total),
+      size * 1.12,
+      0.57
+    );
+
+    return out;
   }
 
   // Pointer & Touch Gestures (drag to spin, pinch to zoom, tap to sparkle)
@@ -772,6 +843,39 @@
     velY = 0;
     velX = 0;
     zoom = 1.0;
+  });
+
+  btnSave.addEventListener("click", () => {
+    const out = exportWidgetCard();
+    if (!out || typeof out.toBlob !== "function") return;
+    out.toBlob(async (blob) => {
+      if (!blob) return;
+      const file = typeof File === "function"
+        ? new File([blob], "for-pisya-bouquet.png", { type: "image/png" })
+        : null;
+
+      if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], title: "for pisya ♥" });
+          saveLabel.textContent = "Saved!";
+          setTimeout(() => { saveLabel.textContent = "Save"; }, 1600);
+          return;
+        } catch (err) {
+          if (err && err.name === "AbortError") return;
+        }
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "for-pisya-bouquet.png";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      saveLabel.textContent = "Saved!";
+      setTimeout(() => { saveLabel.textContent = "Save"; }, 1600);
+    }, "image/png");
   });
 
   // Animation loop

@@ -1,4 +1,4 @@
-const CACHE_NAME = "ascii-bouquet-v2";
+const CACHE_NAME = "ascii-bouquet-v3";
 const APP_SHELL = [
   "./",
   "./index.html",
