@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b090e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>ASCII Bouquet</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app">
+    <canvas id="bouquet-canvas" aria-label="Interactive 3D ASCII flower bouquet"></canvas>
+
+    <header class="dedication" id="dedication">
+      <p class="dedication-kicker" id="dedication-kicker">coded for you</p>
+      <h1 class="dedication-title" id="dedication-title">a digital bouquet</h1>
+      <p class="dedication-msg" id="dedication-msg">drag to spin · tap for sparkles</p>
+    </header>
+
+    <nav class="controls" aria-label="Bouquet controls">
+      <button type="button" class="pill-btn" id="btn-play" aria-pressed="true" title="Toggle auto-spin">
+        <span id="play-icon">❚❚</span>
+        <span id="play-label">Spin</span>
+      </button>
+      <button type="button" class="pill-btn" id="btn-theme" title="Cycle bouquet palette">
+        <span>✿</span>
+        <span id="theme-label">Rose</span>
+      </button>
+      <button type="button" class="pill-btn" id="btn-reset" title="Reset camera view">
+        <span>↺</span>
+        <span>Reset</span>
+      </button>
+      <button type="button" class="pill-btn pill-accent" id="btn-customize" title="Personalize & share">
+        <span>✎</span>
+        <span>Send</span>
+      </button>
+    </nav>
+
+    <section class="sheet-backdrop" id="sheet-backdrop" hidden>
+      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+        <div class="sheet-header">
+          <h2 id="sheet-title">Personalize Bouquet</h2>
+          <button type="button" class="icon-close" id="btn-close-sheet" aria-label="Close">✕</button>
+        </div>
+        <form id="customize-form" class="sheet-form">
+          <label class="field">
+            <span>For (name)</span>
+            <input type="text" id="input-to" maxlength="32" placeholder="e.g. Maya" />
+          </label>
+          <label class="field">
+            <span>Message</span>
+            <input type="text" id="input-msg" maxlength="70" placeholder="e.g. coded these flowers for you" />
+          </label>
+          <label class="field">
+            <span>Palette</span>
+            <select id="input-theme">
+              <option value="rose">Classic Rose</option>
+              <option value="sunset">Sunset Peach</option>
+              <option value="lavender">Lavender Dream</option>
+              <option value="midnight">Midnight Blue</option>
+            </select>
+          </label>
+          <div class="sheet-actions">
+            <button type="submit" class="action-btn primary">Apply</button>
+            <button type="button" class="action-btn secondary" id="btn-share">Share Link</button>
+          </div>
+          <p class="share-status" id="share-status" aria-live="polite"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script src="bouquet.js"></script>
+</body>
+</html>
