@@ -76,6 +76,10 @@ body {
   letter-spacing: 0.04em;
 }
 
+.heart-icon {
+  color: var(--accent);
+}
+
 .dedication-msg {
   margin: 4px 0 0;
   font-size: clamp(11px, 2.9vw, 13px);

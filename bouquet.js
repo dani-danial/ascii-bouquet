@@ -497,11 +497,23 @@
     inputTheme.value = key;
   }
 
+  const DEFAULT_TO = "pisya";
+
   function applyDedication(to, msg) {
     currentTo = (to || "").trim();
     currentMsg = (msg || "").trim();
-    elKicker.textContent = currentTo ? "coded with care" : "coded for you";
-    elTitle.textContent = currentTo ? `for ${currentTo}` : "a digital bouquet";
+    elKicker.textContent = currentTo ? "coded with love" : "coded for you";
+
+    const label = currentTo ? `for ${currentTo}` : "a digital bouquet";
+    const hasHeart = /[♥♡❤]/.test(currentTo);
+    elTitle.textContent = label + (hasHeart ? "" : " ");
+    if (!hasHeart && typeof document.createElement === "function") {
+      const heart = document.createElement("span");
+      heart.className = "heart-icon";
+      heart.textContent = "♥";
+      elTitle.appendChild(heart);
+    }
+
     elMsg.textContent = currentMsg || "drag to spin · tap for sparkles";
     inputTo.value = currentTo;
     inputMsg.value = currentMsg;
@@ -510,7 +522,8 @@
   function loadFromURL() {
     const params = new URLSearchParams(window.location.search);
     applyTheme(params.get("theme") || "rose");
-    applyDedication(params.get("to") || "", params.get("msg") || "");
+    const toParam = params.has("to") ? params.get("to") : DEFAULT_TO;
+    applyDedication(toParam, params.get("msg") || "");
   }
 
   function buildShareURL() {
