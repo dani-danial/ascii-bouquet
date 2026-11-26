@@ -446,16 +446,6 @@
   const btnTheme = document.getElementById("btn-theme");
   const themeLabel = document.getElementById("theme-label");
   const btnReset = document.getElementById("btn-reset");
-  const btnCustomize = document.getElementById("btn-customize");
-
-  const sheetBackdrop = document.getElementById("sheet-backdrop");
-  const btnCloseSheet = document.getElementById("btn-close-sheet");
-  const customizeForm = document.getElementById("customize-form");
-  const inputTo = document.getElementById("input-to");
-  const inputMsg = document.getElementById("input-msg");
-  const inputTheme = document.getElementById("input-theme");
-  const btnShare = document.getElementById("btn-share");
-  const shareStatus = document.getElementById("share-status");
 
   // State
   const bouquetPoints = buildBouquetPoints();
@@ -494,7 +484,6 @@
       `radial-gradient(circle at 50% 42%, ${t.glow}, rgba(11, 9, 14, 0) 65%)`
     );
     themeLabel.textContent = t.label;
-    inputTheme.value = key;
   }
 
   const DEFAULT_TO = "pisya";
@@ -515,8 +504,6 @@
     }
 
     elMsg.textContent = currentMsg || "drag to spin · tap for sparkles";
-    inputTo.value = currentTo;
-    inputMsg.value = currentMsg;
   }
 
   function loadFromURL() {
@@ -524,15 +511,6 @@
     applyTheme(params.get("theme") || "rose");
     const toParam = params.has("to") ? params.get("to") : DEFAULT_TO;
     applyDedication(toParam, params.get("msg") || "");
-  }
-
-  function buildShareURL() {
-    const url = new URL(window.location.href);
-    url.search = "";
-    if (currentTo) url.searchParams.set("to", currentTo);
-    if (currentMsg) url.searchParams.set("msg", currentMsg);
-    if (currentThemeKey !== "rose") url.searchParams.set("theme", currentThemeKey);
-    return url.toString();
   }
 
   function resize() {
@@ -794,63 +772,6 @@
     velY = 0;
     velX = 0;
     zoom = 1.0;
-  });
-
-  btnCustomize.addEventListener("click", () => {
-    shareStatus.textContent = "";
-    sheetBackdrop.hidden = false;
-  });
-
-  btnCloseSheet.addEventListener("click", () => {
-    sheetBackdrop.hidden = true;
-  });
-
-  sheetBackdrop.addEventListener("click", (e) => {
-    if (e.target === sheetBackdrop) sheetBackdrop.hidden = true;
-  });
-
-  function safeReplaceURL(url) {
-    try {
-      window.history.replaceState(null, "", url);
-    } catch {
-      // Ignore on restricted file:// origins
-    }
-  }
-
-  customizeForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    applyDedication(inputTo.value, inputMsg.value);
-    applyTheme(inputTheme.value);
-    safeReplaceURL(buildShareURL());
-    sheetBackdrop.hidden = true;
-  });
-
-  btnShare.addEventListener("click", async () => {
-    applyDedication(inputTo.value, inputMsg.value);
-    applyTheme(inputTheme.value);
-    const shareUrl = buildShareURL();
-    safeReplaceURL(shareUrl);
-
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: currentTo ? `A bouquet for ${currentTo}` : "ASCII Bouquet",
-          text: currentMsg || "I coded you a flower bouquet",
-          url: shareUrl,
-        });
-        shareStatus.textContent = "Shared!";
-        return;
-      } catch (err) {
-        if (err && err.name === "AbortError") return;
-      }
-    }
-
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      shareStatus.textContent = "Link copied to clipboard!";
-    } catch {
-      shareStatus.textContent = "URL updated in address bar — copy & send!";
-    }
   });
 
   // Animation loop

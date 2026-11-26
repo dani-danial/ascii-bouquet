@@ -36,44 +36,7 @@
         <span>↺</span>
         <span>Reset</span>
       </button>
-      <button type="button" class="pill-btn pill-accent" id="btn-customize" title="Personalize & share">
-        <span>✎</span>
-        <span>Send</span>
-      </button>
     </nav>
-
-    <section class="sheet-backdrop" id="sheet-backdrop" hidden>
-      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
-        <div class="sheet-header">
-          <h2 id="sheet-title">Personalize Bouquet</h2>
-          <button type="button" class="icon-close" id="btn-close-sheet" aria-label="Close">✕</button>
-        </div>
-        <form id="customize-form" class="sheet-form">
-          <label class="field">
-            <span>For (name)</span>
-            <input type="text" id="input-to" maxlength="32" placeholder="e.g. Maya" />
-          </label>
-          <label class="field">
-            <span>Message</span>
-            <input type="text" id="input-msg" maxlength="70" placeholder="e.g. coded these flowers for you" />
-          </label>
-          <label class="field">
-            <span>Palette</span>
-            <select id="input-theme">
-              <option value="rose">Classic Rose</option>
-              <option value="sunset">Sunset Peach</option>
-              <option value="lavender">Lavender Dream</option>
-              <option value="midnight">Midnight Blue</option>
-            </select>
-          </label>
-          <div class="sheet-actions">
-            <button type="submit" class="action-btn primary">Apply</button>
-            <button type="button" class="action-btn secondary" id="btn-share">Share Link</button>
-          </div>
-          <p class="share-status" id="share-status" aria-live="polite"></p>
-        </form>
-      </div>
-    </section>
   </main>
 
   <script src="bouquet.js"></script>
