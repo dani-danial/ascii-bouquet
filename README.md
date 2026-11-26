@@ -1,27 +1,19 @@
-# ASCII Bouquet (Mobile Web)
+# for pisya ♥ — ASCII Bouquet (PWA)
 
-An interactive, spinning 3D ASCII flower bouquet built for phone screens (iOS Safari & Android Chrome) with zero dependencies.
+An interactive, spinning 3D ASCII flower bouquet built as an installable Progressive Web App (PWA) for iPhone and Android.
 
-## Features
-- **3D Z-buffered ASCII Bouquet:** Roses, daisies, tulips, baby's breath, leafy stems, paper cone wrap, ribbon bow, and floating sparkles/hearts.
-- **Touch Controls:** Drag to spin & tilt, pinch to zoom, tap anywhere for a sparkle/heart burst.
-- **4 Color Palettes:** Classic Rose, Sunset Peach, Lavender Dream, Midnight Blue.
-- **Personalize & Share:** Tap **Send** to set a recipient name and custom message, or pass URL params directly:
-  ```
-  ?to=Maya&msg=coded%20these%20flowers%20for%20you&theme=rose
-  ```
+**Live App:** https://dani-danial.github.io/ascii-bouquet/
 
-## How to Launch on Your Phone
+## Install as an App on Your Phone
+- **iPhone (Safari):** Open the link → tap **Share** → **Add to Home Screen**
+- **Android (Chrome):** Open the link → tap **⋮** → **Install app** (or **Add to Home screen**)
 
-### Option 1: Share as a Real Link (Best for Sending to Someone)
-Deploy the folder (`index.html`, `styles.css`, `bouquet.js`) to any free static host:
-- **Netlify Drop:** Drag this folder onto https://app.netlify.com/drop — you get an instant `https://...` link to open or text to anyone.
-- **GitHub Pages:** Push these files to a GitHub repo and enable **Settings → Pages → Deploy from branch**.
+Once installed, it launches full-screen with its own icon and works offline.
 
-### Option 2: Preview on Your Phone via Local Wi-Fi (Same Network)
-From this project folder on Windows, run a quick local HTTP server (for example using Node.js):
-```powershell
-npx --yes serve . -l 3000
-```
-Then open `http://<YOUR-PC-LOCAL-IP>:3000` in Safari or Chrome on your phone.
-*(Tip: run `ipconfig` in PowerShell to find your PC's IPv4 address.)*
+## Controls
+- **Drag** to spin & tilt in 3D
+- **Pinch** to zoom in/out
+- **Tap** anywhere for extra hearts & sparkles
+- **Bottom bar:** Toggle auto-spin, cycle 4 color palettes (`Rose`, `Sunset`, `Lavender`, `Midnight`), or reset the camera angle
+
+*(Note: A customizable copy with the **Send** button is preserved on the `template-with-send` branch.)*

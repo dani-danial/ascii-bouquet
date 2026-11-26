@@ -1,0 +1,25 @@
+{
+  "name": "for pisya ♥",
+  "short_name": "for pisya ♥",
+  "description": "coded with love — a 3D ASCII flower bouquet",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0b090e",
+  "theme_color": "#0b090e",
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
